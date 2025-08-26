@@ -42,7 +42,7 @@ class _NotesShowCaseState extends State<NotesShowCase> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.edit, color: AppColors.dullWhite, size: 28),
+                    Icon(Icons.edit, color: AppColors.dullWhite, size: 22),
                     SizedBox(width: 10),
                     (Text(
                       widget.title,
@@ -62,7 +62,7 @@ class _NotesShowCaseState extends State<NotesShowCase> {
                     color: AppColors.white,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w500,
-                    fontSize: 18,
+                    fontSize: 14,
                   ),
                   textAlign: TextAlign.left,
                 ),
@@ -75,7 +75,7 @@ class _NotesShowCaseState extends State<NotesShowCase> {
                 color: AppColors.dullWhite,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w300,
-                fontSize: 18,
+                fontSize: 14,
               ),
             ),
           ],

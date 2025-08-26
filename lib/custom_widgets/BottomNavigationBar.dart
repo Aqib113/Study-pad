@@ -29,7 +29,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         child:
             // The actual BottomNavigationBar widget.
             BottomNavigationBar(
-              selectedFontSize: 16, // Font size for selected tab label.
+              selectedFontSize: 14, // Font size for selected tab label.
               unselectedFontSize: 14, // Font size for unselected tab label.
               selectedItemColor:AppColors.highlightColor1, // Color for selected icon/label.
               unselectedItemColor: AppColors.white, // Color for unselected icon/label.
@@ -45,16 +45,17 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   icon: Icon(
                     Icons.notes_outlined,
                     color: AppColors.white,
-                    size: 32,
+                    size: 26,
                   ),
                   label: "Notes",
+
                 ),
                 // Second tab: Tasks
                 BottomNavigationBarItem(
                   icon: Icon(
                     Icons.task_alt_outlined,
                     color: AppColors.white,
-                    size: 32,
+                    size: 26,
                   ),
                   label: "Tasks",
                 ),

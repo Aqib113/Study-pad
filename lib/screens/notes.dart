@@ -12,6 +12,7 @@ class NotesPage extends StatefulWidget {
 
 class _NotesPage extends State<NotesPage> {
   TextEditingController controller = TextEditingController();
+  FocusNode _focusNode = FocusNode();
   final notes = [
     [
       'Title',
@@ -34,7 +35,7 @@ class _NotesPage extends State<NotesPage> {
         padding: EdgeInsets.all(12),
         child: Column(
           children: [
-            CustomSearchBar(Req_controller: controller),
+            CustomSearchBar(Req_controller: controller, focusNode: _focusNode,),
             ...List.generate(
               notes.length,
               (index) => NotesShowCase(

@@ -47,7 +47,7 @@ class _TaskShowcaseState extends State<TaskShowcase> {
             width: 60,
             height: 60,
             child: Transform.scale(
-              scale: 1.3, // Makes the checkbox larger.
+              scale: 1.1, // Makes the checkbox larger.
               child: Checkbox(
                 value: widget.taskStatus == TaskStatus.pending
                     ? false
@@ -66,7 +66,7 @@ class _TaskShowcaseState extends State<TaskShowcase> {
               style: TextStyle(
                 color: AppColors.white,
                 fontFamily: 'poppins',
-                fontSize: 22,
+                fontSize: 18,
               ),
             ),
           ),
@@ -74,7 +74,7 @@ class _TaskShowcaseState extends State<TaskShowcase> {
           // Button to delete Particular task
           IconButton(
             onPressed: widget.deleteTask,
-            icon: Icon(Icons.delete, size: 24, color: AppColors.dullWhite),
+            icon: Icon(Icons.delete, size: 22, color: AppColors.dullWhite),
           ),
         ],
       ),

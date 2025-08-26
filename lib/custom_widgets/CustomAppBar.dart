@@ -29,17 +29,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           appBarTitles[currentIndex],
           style: TextStyle(
             color: AppColors.white,
-            fontSize: 28,
+            fontSize: 22,
             fontWeight: FontWeight.w500,
-            fontFamily: 'poppins',
+            fontFamily: 'montserrat',
           ),
         ),
         // Settings button on the right
         actions: [
           IconButton(
             onPressed: () => Navigator.pushNamed(context, '/settings'),
-            icon: Icon(Icons.settings_sharp),
-            iconSize: 36,
+            icon:  const Icon(Icons.settings_sharp),
+            iconSize: 24,
             color: AppColors.white,
           ),
         ],
