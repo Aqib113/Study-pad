@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:notesapp/database/models.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:notesapp/database/models.dart';
 import 'package:notesapp/screens/editNotes.dart';
 import 'package:notesapp/screens/home.dart';
 import 'package:notesapp/screens/settings.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +14,16 @@ void main() async {
   Hive.registerAdapter(TaskAdapter());
 
   await Hive.openBox<Task>('Taskbox');
-  runApp(const MyApp());
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => SelectionMode()),
+        ChangeNotifierProvider(create: (context) => SelectedItems()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

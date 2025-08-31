@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:notesapp/database/Hive.dart';
+import 'package:notesapp/database/models.dart';
 import 'package:notesapp/custom_widgets/TasksShowCase.dart';
 import 'package:notesapp/custom_widgets/colors.dart';
 import 'package:notesapp/custom_widgets/CustomSearchBar.dart';
-import 'package:notesapp/database/models.dart';
+import 'package:provider/provider.dart';
+import 'package:notesapp/custom_widgets/SelectionModeWidgets.dart';
 
 class TaskPage extends StatefulWidget {
   const TaskPage({super.key});
@@ -15,21 +17,19 @@ class TaskPage extends StatefulWidget {
 class _TaskPage extends State<TaskPage> {
   TextEditingController SearchBar_controller = TextEditingController();
   TextEditingController _TaskInputController = TextEditingController();
-  bool _Enabled = false;
-  List<Task> tasks = [];
-  FocusNode _focusNode = FocusNode();
+  bool _EnabledToAddTask = false;
+  final FocusNode _focusNode = FocusNode();
   OverlayEntry? _overlayEntry;
-
+  List<Task> tasks = [];
+  // selectedItemsList
 
   void initState() {
     super.initState();
     _TaskInputController.addListener(() {
       setState(() {
-        _Enabled = _TaskInputController.text.isNotEmpty;
+        _EnabledToAddTask = _TaskInputController.text.isNotEmpty;
       });
-
-      }
-    );
+    });
     getAllTasks();
   }
 
@@ -51,9 +51,8 @@ class _TaskPage extends State<TaskPage> {
   }
 
   Future<void> ChangeStatus(key, value) async {
-    print(value);
     await TaskManager.changeStatus(key, value);
-    setState(() {});
+    getAllTasks();
   }
 
   void RemoveOverlay() {
@@ -111,7 +110,9 @@ class _TaskPage extends State<TaskPage> {
 
                   Container(
                     width: MediaQuery.of(context).size.width * 0.9,
-                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom,),
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.thirdColor,
                       borderRadius: BorderRadius.circular(10),
@@ -138,7 +139,6 @@ class _TaskPage extends State<TaskPage> {
                           borderSide: BorderSide(
                             width: 0.7,
                             color: AppColors.thirdColor,
-
                           ),
                         ),
                       ),
@@ -148,8 +148,15 @@ class _TaskPage extends State<TaskPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: _Enabled? saveNewTask:null,
-                        child: Text("Save", style: TextStyle(color: _Enabled? AppColors.stylishText:AppColors.thirdColor),),
+                        onPressed: _EnabledToAddTask ? saveNewTask : null,
+                        child: Text(
+                          "Save",
+                          style: TextStyle(
+                            color: _EnabledToAddTask
+                                ? AppColors.stylishText
+                                : AppColors.thirdColor,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -167,6 +174,13 @@ class _TaskPage extends State<TaskPage> {
     Overlay.of(context).insert(_overlayEntry!);
   }
 
+  void DeleteSelectedTasks() async{
+    List<int> tasksToDelete = Provider.of<SelectedItems>(context, listen: false).selectedItemsList;
+    for (var task in tasksToDelete){
+      await deleteTasks(task);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -174,44 +188,69 @@ class _TaskPage extends State<TaskPage> {
       onTap: () {
         FocusScope.of(context).unfocus();
       },
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        backgroundColor: AppColors.primaryColor,
-        body: Container(
-          padding: EdgeInsets.all(12),
-          child: Column(
-            children: [
-              CustomSearchBar(
-                Req_controller: SearchBar_controller,
-                focusNode: _focusNode,
-              ),
-              Expanded(
-                child: ListView(
-                  scrollDirection: Axis.vertical,
-                  children: List.generate(
-                    tasks.length,
-                    (index) => TaskShowcase(
-                      task: tasks[index].title,
-                      taskStatus: tasks[index].status,
-                      onChange: (bool? value) {
-                        ChangeStatus(tasks[index].key, value);
-                      },
-                      deleteTask: () {
-                        deleteTasks(tasks[index].key);
-                      },
+      child: Consumer2<SelectionMode, SelectedItems>(
+        builder: (context, selectionMode, selectedItems, child) => Scaffold(
+          resizeToAvoidBottomInset: true,
+          backgroundColor: AppColors.primaryColor,
+          body: Container(
+            padding: EdgeInsets.all(12),
+            child: Column(
+              children: [
+                selectionMode.selectionModeValue
+                    ? HeadingText()
+                    : CustomSearchBar(
+                        Req_controller: SearchBar_controller,
+                        focusNode: _focusNode,
+                      ),
+                Expanded(
+                  child: ListView(
+                    scrollDirection: Axis.vertical,
+                    children: List.generate(
+                      tasks.length,
+                      (index) => GestureDetector(
+                        onLongPress: () =>
+                            selectionMode.ToggleSelectionMode(true, context),
+                        child: TaskShowcase(
+                          task: tasks[index].title,
+                          taskStatus: tasks[index].status,
+                          selectionMode: selectionMode.selectionModeValue,
+                          taskId: tasks[index].key,
+                          selectedItemsList: selectedItems.selectedItemsList,
+                          changeStatus: (bool? value) {
+                            ChangeStatus(tasks[index].key, value);
+                          },
+                          updateSelection: (bool? _value) {
+                            selectedItems.UpdateSelection(
+                              _value,
+                              tasks[index].key,
+                            );
+                            setState(() {});
+                            print('-------------------------------------');
+                            print(selectedItems.selectedItemsList);
+                          },
+                          deleteTask: () {
+                            deleteTasks(tasks[index].key);
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: ShowAddNewTaskInput,
-          elevation: 0,
-          backgroundColor: AppColors.thirdColor,
-          foregroundColor: AppColors.stylishText,
-          child: Icon(Icons.add, color: AppColors.stylishText, size: 32),
+          floatingActionButton: FloatingActionButton(
+            onPressed: selectionMode.selectionModeValue
+                ?  DeleteSelectedTasks
+                :  ShowAddNewTaskInput,
+            elevation: 0,
+            backgroundColor: AppColors.thirdColor,
+            foregroundColor: AppColors.stylishText,
+            child:
+              selectionMode.selectionModeValue
+              ?  Icon(Icons.delete, color: AppColors.stylishText, size: 32)
+              :  Icon(Icons.add, color: AppColors.stylishText, size: 32),
+          ),
         ),
       ),
     );

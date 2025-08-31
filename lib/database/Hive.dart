@@ -29,4 +29,15 @@ class TaskManager {
     final taskBox = Hive.box<Task>('TaskBox');
     taskBox.delete(key);
   }
+
+  static Future deleteAllTasks() async{
+    final taskBox = Hive.box<Task>('TaskBox');
+    taskBox.clear();
+  }
+
+  static Future GetIds() async{
+    final taskBox = Hive.box<Task>('TaskBox');
+    final ids = taskBox.keys;
+    return ids;
+  }
 }

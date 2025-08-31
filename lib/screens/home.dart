@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
   int current_index = 0;
 
   // FUNCTIONS
-  void OnTap(index) {
+  void NavTo(index) {
     setState(() {
       current_index = index;
     });
@@ -27,16 +27,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
-      appBar: CustomAppBar(currentIndex: current_index,),
+      appBar: CustomAppBar(currentIndex: current_index),
       body:
-      
-      // Indexed Stack for tracking the pages
-      IndexedStack(
-        index: current_index,
-        children: [NotesPage(), TaskPage()],
-      ),
+          // Indexed Stack for tracking the pages
+          IndexedStack(
+            index: current_index,
+            children: [NotesPage(), TaskPage()],
+          ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        onTap: OnTap,
+        onTap: NavTo,
         currentIndex: current_index,
       ),
     );
