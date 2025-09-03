@@ -19,18 +19,30 @@ class _TaskPage extends State<TaskPage> {
   TextEditingController _TaskInputController = TextEditingController();
   bool _EnabledToAddTask = false;
   final FocusNode _focusNodeForSearchBar = FocusNode();
+  final FocusNode _focusNodeForTaskInput = FocusNode();
   OverlayEntry? _overlayEntry;
   List<Task> tasks = [];
   // selectedItemsList
 
   void initState() {
     super.initState();
-    _TaskInputController.addListener(() {
-      setState(() {
-        _EnabledToAddTask = _TaskInputController.text.isNotEmpty;
-      });
-    });
     getAllTasks();
+    _TaskInputController.addListener(() {
+
+        _EnabledToAddTask = _TaskInputController.text.trim().isNotEmpty;
+        _overlayEntry?.markNeedsBuild();
+
+    });
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers and focus nodes to prevent memory leaks
+    _TaskInputController.dispose();
+    SearchBar_controller.dispose();
+    _focusNodeForSearchBar.dispose();
+    _focusNodeForTaskInput.dispose();
+    super.dispose();
   }
 
   Future<void> saveNewTask() async {
@@ -59,10 +71,10 @@ class _TaskPage extends State<TaskPage> {
     _overlayEntry?.remove();
     _TaskInputController.clear();
     _overlayEntry = null;
+    _focusNodeForTaskInput.unfocus();
   }
 
   Widget ShowOverlay(BuildContext) {
-
     return Stack(
       children: [
         GestureDetector(
@@ -76,7 +88,7 @@ class _TaskPage extends State<TaskPage> {
 
         Positioned(
           left: 0,
-          bottom: MediaQuery.of(context).viewInsets.bottom,
+          bottom: 280,
           child: Material(
             type: MaterialType.transparency,
             child: Container(
@@ -121,7 +133,7 @@ class _TaskPage extends State<TaskPage> {
 
                     alignment: Alignment.center,
                     child: TextField(
-                      autofocus: true,
+                      focusNode: _focusNodeForTaskInput,
                       controller: _TaskInputController,
                       style: TextStyle(
                         color: AppColors.white,
@@ -175,8 +187,10 @@ class _TaskPage extends State<TaskPage> {
     _overlayEntry = OverlayEntry(builder: ShowOverlay);
     Overlay.of(context).insert(_overlayEntry!);
 
+    await Future.delayed(Duration(microseconds: 50));
+    _focusNodeForTaskInput.requestFocus();
   }
-    
+
   void DeleteSelectedTasks() async {
     List<int> tasksToDelete = Provider.of<SelectedItems>(
       context,
@@ -185,7 +199,10 @@ class _TaskPage extends State<TaskPage> {
     for (var task in tasksToDelete) {
       await deleteTasks(task);
     }
-    Provider.of<SelectionMode>(context, listen: false).ToggleSelectionMode(false, context);
+    Provider.of<SelectionMode>(
+      context,
+      listen: false,
+    ).ToggleSelectionMode(false, context);
   }
 
   @override

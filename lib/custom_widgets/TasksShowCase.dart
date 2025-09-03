@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notesapp/custom_widgets/colors.dart';
 import 'package:notesapp/database/models.dart';
+
 // TaskShowcase is a widget that displays a single task with a checkbox and its title.
 class TaskShowcase extends StatefulWidget {
   // The text/title of the task.
@@ -50,11 +51,11 @@ class _TaskShowcaseState extends State<TaskShowcase> {
                 value: widget.taskStatus == TaskStatus.pending
                     ? false
                     : true, // Whether the checkbox is checked.
-                onChanged: widget.changeStatus, // Calls parent callback on change.
+                onChanged:
+                    widget.changeStatus, // Calls parent callback on change.
                 activeColor: AppColors.secondaryColor, // Color when checked.
                 checkColor: AppColors.highlightColor1, // Checkmark color.
-                shape:  const CircleBorder(),
-
+                shape: const CircleBorder(),
               ),
             ),
           );
@@ -68,18 +69,21 @@ class _TaskShowcaseState extends State<TaskShowcase> {
             child: Transform.scale(
               scale: 1.1, // Makes the checkbox larger.
               child: Checkbox(
-                value: widget.selectedItemsList.contains(widget.taskId), // Whether the checkbox is checked.
-                onChanged: widget.updateSelection, // Calls parent callback on change.
+                value: widget.selectedItemsList.contains(
+                  widget.taskId,
+                ), // Whether the checkbox is checked.
+                onChanged:
+                    widget.updateSelection, // Calls parent callback on change.
                 activeColor: AppColors.primaryColor, // Color when checked.
                 checkColor: AppColors.white, // Checkmark color.
               ),
             ),
           )
         : Container();
-        // : IconButton(
-        //     onPressed: widget.deleteTask,
-        //     icon: Icon(Icons.delete, size: 22, color: AppColors.dullWhite),
-        //   );
+    // : IconButton(
+    //     onPressed: widget.deleteTask,
+    //     icon: Icon(Icons.delete, size: 22, color: AppColors.dullWhite),
+    //   );
   }
 
   @override
@@ -106,10 +110,17 @@ class _TaskShowcaseState extends State<TaskShowcase> {
             child: Text(
               widget.task,
               style: TextStyle(
-                color: AppColors.white,
+                color: widget.taskStatus == TaskStatus.completed
+                    ? AppColors.dullWhite
+                    : AppColors.white ,
                 fontFamily: 'montserrat',
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
+                decoration: widget.taskStatus == TaskStatus.completed
+                    ? TextDecoration.lineThrough
+                    : TextDecoration.none,
+                decorationThickness: 1.5,
+                decorationColor: AppColors.highlightColor1,
               ),
             ),
           ),
