@@ -18,7 +18,7 @@ class _TaskPage extends State<TaskPage> {
   TextEditingController SearchBar_controller = TextEditingController();
   TextEditingController _TaskInputController = TextEditingController();
   bool _EnabledToAddTask = false;
-  final FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNodeForSearchBar = FocusNode();
   OverlayEntry? _overlayEntry;
   List<Task> tasks = [];
   // selectedItemsList
@@ -62,6 +62,7 @@ class _TaskPage extends State<TaskPage> {
   }
 
   Widget ShowOverlay(BuildContext) {
+
     return Stack(
       children: [
         GestureDetector(
@@ -75,7 +76,7 @@ class _TaskPage extends State<TaskPage> {
 
         Positioned(
           left: 0,
-          bottom: 0,
+          bottom: MediaQuery.of(context).viewInsets.bottom,
           child: Material(
             type: MaterialType.transparency,
             child: Container(
@@ -120,6 +121,7 @@ class _TaskPage extends State<TaskPage> {
 
                     alignment: Alignment.center,
                     child: TextField(
+                      autofocus: true,
                       controller: _TaskInputController,
                       style: TextStyle(
                         color: AppColors.white,
@@ -172,13 +174,18 @@ class _TaskPage extends State<TaskPage> {
   void ShowAddNewTaskInput() async {
     _overlayEntry = OverlayEntry(builder: ShowOverlay);
     Overlay.of(context).insert(_overlayEntry!);
-  }
 
-  void DeleteSelectedTasks() async{
-    List<int> tasksToDelete = Provider.of<SelectedItems>(context, listen: false).selectedItemsList;
-    for (var task in tasksToDelete){
+  }
+    
+  void DeleteSelectedTasks() async {
+    List<int> tasksToDelete = Provider.of<SelectedItems>(
+      context,
+      listen: false,
+    ).selectedItemsList;
+    for (var task in tasksToDelete) {
       await deleteTasks(task);
     }
+    Provider.of<SelectionMode>(context, listen: false).ToggleSelectionMode(false, context);
   }
 
   @override
@@ -200,7 +207,7 @@ class _TaskPage extends State<TaskPage> {
                     ? HeadingText()
                     : CustomSearchBar(
                         Req_controller: SearchBar_controller,
-                        focusNode: _focusNode,
+                        focusNode: _focusNodeForSearchBar,
                       ),
                 Expanded(
                   child: ListView(
@@ -241,15 +248,14 @@ class _TaskPage extends State<TaskPage> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: selectionMode.selectionModeValue
-                ?  DeleteSelectedTasks
-                :  ShowAddNewTaskInput,
+                ? DeleteSelectedTasks
+                : ShowAddNewTaskInput,
             elevation: 0,
             backgroundColor: AppColors.thirdColor,
             foregroundColor: AppColors.stylishText,
-            child:
-              selectionMode.selectionModeValue
-              ?  Icon(Icons.delete, color: AppColors.stylishText, size: 32)
-              :  Icon(Icons.add, color: AppColors.stylishText, size: 32),
+            child: selectionMode.selectionModeValue
+                ? Icon(Icons.delete, color: AppColors.stylishText, size: 32)
+                : Icon(Icons.add, color: AppColors.stylishText, size: 32),
           ),
         ),
       ),
